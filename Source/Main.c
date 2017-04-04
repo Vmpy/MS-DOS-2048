@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <conio.h>
 
-int _2048[4][4] = {{0},{0},{0},{0}};
+int _2048[4][4];
 
 int Score = 0;
 
@@ -59,6 +59,11 @@ void Start(void)
 		}
 		temp = x;
 		_2048[x][y] = Random(); 
+	}
+	for(x = 0;x < 4;x++){
+		for(y = 0;y < 4;y++){
+			_2048[x][y] = 0;
+		}
 	}
 	Display();
 }
