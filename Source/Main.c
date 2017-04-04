@@ -1,3 +1,4 @@
+/*太多的bug，没有可玩性，作为初学者的练手项目*/
 #include <stdio.h>
 #include <windows.h>
 #include <stdlib.h>
