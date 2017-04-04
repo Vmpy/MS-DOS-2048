@@ -50,7 +50,8 @@ void Start(void)
 {
 	int count,temp;
 	int x,y;
-	temp = -1;
+	Score =	0;
+        temp = -1;
 	for(x = 0;x < 4;x++){
 		for(y = 0;y < 4;y++){
 			_2048[x][y] = 0;
