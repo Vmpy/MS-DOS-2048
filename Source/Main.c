@@ -1,290 +1,261 @@
-/*太多的bug，没有可玩性，作为初学者的练手项目*/
 #include <stdio.h>
-#include <windows.h>
 #include <stdlib.h>
+#include <time.h>
 #include <conio.h>
+#include <windows.h>
+
+#define RIGHT 3
+#define LEFT 0
+#define UP 0
+#define DOWN 3
 
 int _2048[4][4];
 
-int Score = 0;
-
-int CountZero(int,int,int);
-void GameOver(void);
-void Start(void);
-void Play(void);
-void Display(void);
-
-void Seed(void); 
-int Random(void);
-
-int Left(void);
-int Right(void);
-int Down(void);
-int Up(void);
-int Detection(void);
+int Display(void);//显示操作 
+int MakeEmpty(void);//清空地图 
+int Init(void);//初始化操作 
+int Random(void);//地图随机生成2或4 
+int Move(char Mode);//数字的移动 
+int FindMax(void);//找到地图中的最大数，作为分数 
+int Play(void);//第二Main函数 
+int GameOver(void);//游戏结束 
+int End(void);//最终选择 
 
 int main(void)
 {
-	char choice;
-	God:
-	srand((unsigned)(time(0)));
-	Start();
+	srand((unsigned)time(NULL));
+	PlayAgain:
+	Init();
 	Play();
-	Sleep(3000);
-	GameOver();
-	printf("\n\nDo you want to play again?(X\\Y)\n\n");
-	Jeez:
-	scanf("%c",&choice);
-	switch(choice)
+	if(End())
 	{
-		case 'X':
-		case 'x': goto God;break;
-		case 'Y':
-		case 'y':break;
-		default:goto Jeez;break;
+		goto PlayAgain;
 	}
 	return 0;
 }
 
-void Start(void)
+int Init(void)
 {
-	int count,temp;
+	MakeEmpty();
+	return _2048[rand()%4][rand()%4] = Random();
+}
+
+int MakeEmpty(void)
+{
 	int x,y;
-	Score =	0;
-        temp = -1;
-	for(x = 0;x < 4;x++){
-		for(y = 0;y < 4;y++){
+	for(x = 0;x < 4;x++)
+	{
+		for(y = 0;y < 4;y++)
+		{
 			_2048[x][y] = 0;
 		}
 	}
-	for(count = 0;count < 2;count++){
-		loop:
-		x = rand() % 4;
-		y = rand() % 4;
-		if(x == temp){
-			goto loop;
-		}
-		temp = x;
-		_2048[x][y] = Random(); 
-	}
-	Display();
+	return 0;
 }
 
-void Play(void)
+int Move(char Mode)
 {
-	int num;
-	char enter;
-	while(Detection()){
-		enter = getch();
-		switch(enter){
-			case 'W':Up();break;
-			case 'S':Down();break;
-			case 'A':Left();break;
-			case 'D':Right();break;
-			default: continue;
+	int x,y;
+	int Tmp; 
+	switch(Mode)
+	{
+		case 'A':
+		case 'a':
+		{
+			for(x = LEFT;x <= RIGHT;x++)
+			{
+				for(y = UP;y <= DOWN;y++)
+				{
+					Tmp = x;
+					if(_2048[Tmp-1][y] == _2048[Tmp][y])
+					{
+						_2048[Tmp-1][y] *= 2;
+						_2048[Tmp][y] = 0;
+					}
+					while(!_2048[Tmp-1][y] && Tmp-1 >= LEFT)
+					{
+						_2048[Tmp-1][y] = _2048[Tmp][y];
+						_2048[Tmp][y] = 0;
+						Tmp--;
+					}
+					if(_2048[Tmp-1][y] == _2048[Tmp][y])
+					{
+						_2048[Tmp-1][y] *= 2;
+						_2048[Tmp][y] = 0;
+					}
+				}
+			}
+			break;
 		}
+		case 'D':
+		case 'd':
+		{
+			for(x = RIGHT;x >= LEFT;x--)
+			{
+				for(y = UP;y <= DOWN;y++)
+				{
+					Tmp = x;
+					if(_2048[Tmp+1][y] == _2048[Tmp][y])
+					{
+						_2048[Tmp+1][y] *= 2;
+						_2048[Tmp][y] = 0;
+					}
+					while(!_2048[Tmp+1][y] && Tmp+1 <= RIGHT)
+					{
+						_2048[Tmp+1][y] = _2048[Tmp][y];
+						_2048[Tmp][y] = 0;
+						Tmp++;
+					}
+					if(_2048[Tmp+1][y] == _2048[Tmp][y])
+					{
+						_2048[Tmp+1][y] *= 2;
+						_2048[Tmp][y] = 0;
+					}
+				}
+			}
+			break;
+		}
+		case 'W':
+		case 'w':
+		{
+			for(x = LEFT;x <= RIGHT;x++)
+			{
+				for(y = UP;y <= DOWN;y++)
+				{
+					Tmp = y;
+					if(_2048[x][Tmp-1] == _2048[x][Tmp])
+					{
+						_2048[x][Tmp-1] *= 2;
+						_2048[x][Tmp] = 0;
+					}
+					while(!_2048[x][Tmp-1] && Tmp-1 >= UP)
+					{
+						_2048[x][Tmp-1] = _2048[x][Tmp];
+						_2048[x][Tmp] = 0;
+						Tmp--;
+					}
+					if(_2048[x][Tmp-1] == _2048[x][Tmp])
+					{
+						_2048[x][Tmp-1] *= 2;
+						_2048[x][Tmp] = 0;
+					}
+				}
+			}
+			break;
+		}
+		case 'S':
+		case 's': 
+		{
+			for(x = LEFT;x <= RIGHT;x++)
+			{
+				for(y = DOWN;y >= UP;y--)
+				{
+					Tmp = y;
+					if(_2048[x][Tmp+1] == _2048[x][Tmp])
+					{
+						_2048[x][Tmp+1] *= 2;
+						_2048[x][Tmp] = 0;
+					}
+					while(!_2048[x][Tmp+1] && Tmp+1 <= DOWN)
+					{
+						_2048[x][Tmp+1] = _2048[x][Tmp];
+						_2048[x][Tmp] = 0;
+						Tmp++;
+					}
+					if(_2048[x][Tmp+1] == _2048[x][Tmp])
+					{
+						_2048[x][Tmp+1] *= 2;
+						_2048[x][Tmp] = 0;
+					}
+				}
+			}
+			break;
+		}
+		default:return 1;
 	}
+	return 0;
 }
 
-int Up(void)
+int Play(void)
 {
-	int x,y;
-	int decide = 0;                     //判断是否有元素合并 
-	for(x = 0;x < 4;x++){
-		for(y = 1;y < 4;y++){		//这里的y初始化为1，因为数组第一个元素没有移动意义。
-			if(_2048[x][y] == 0){
-				continue;
-			}
-			else if(_2048[x][y-1] == _2048[x][y]){
-				Score += (_2048[x][y-1] = _2048[x][y]*2);
-				_2048[x][y] = 0;
-				decide = 1;
-				continue;
-			}
-			else if(_2048[x][y-2] == _2048[x][y]){
-				if(_2048[x][y-1] == 0){						//判断挨近元素是否为空 
-					Score += (_2048[x][y-2] = _2048[x][y]*2);
-					_2048[x][y] = 0;
-					decide = 1;
-				}
-				continue;
-			}
-			else if(_2048[x][y-3] == _2048[x][y]){
-				if(_2048[x][y-2] == 0 && _2048[x][y-1] == 0){
-					Score += (_2048[x][y-3] = _2048[x][y]*2);
-					_2048[x][y] = 0;
-					decide = 1;
-				}
-				continue;
-			}
-			else if(_2048[x][y-1] != 0){
-				continue;
-			}
-			else if(_2048[x][y-1] == 0){
-				_2048[x][y-CountZero(1,x,y)] = _2048[x][y];		
-				_2048[x][y] = 0;
-				decide = 1;
-			}
+	char Enter;
+	int x,y; 
+	while(1)
+	{
+		Display();
+		Enter = getch();
+		Move(Enter);
+		if(!GameOver())
+		{
+			break;
 		}
+		do
+		{
+			x = rand()%4;
+			y = rand()%4;
+		}while(_2048[x][y]);
+		_2048[x][y] = Random();
+		system("cls");
 	}
-	if(decide){
-		Seed();
-	}
-	system("cls");
-	Display();
-	return 0; 
+	return;
 }
 
-int Down(void)
+int Random(void)
 {
-	int x,y;
-	int decide = 0;                     //判断是否有元素合并 
-	for(x = 0;x < 4;x++){
-		for(y = 0;y < 3;y++){		//这里的y小于3，因为第四号元素无移动意义 
-			if(_2048[x][y] == 0){
-				continue;
-			}
-			else if(_2048[x][y+1] == _2048[x][y]){
-				Score += (_2048[x][y+1] = _2048[x][y]*2);
-				_2048[x][y] = 0;
-				decide = 1;
-				continue;
-			}
-			else if(_2048[x][y+2] == _2048[x][y]){
-				if(_2048[x][y+1] == 0){
-					Score += (_2048[x][y+2] = _2048[x][y]*2);
-					_2048[x][y] = 0;
-					decide = 1;
-				}
-				continue;
-			}
-			else if(_2048[x][y+3] == _2048[x][y]){
-				if(_2048[x][y+2] == 0 && _2048[x][y+1] == 0){
-					Score += (_2048[x][y+3] = _2048[x][y]*2);
-					_2048[x][y] = 0;
-					decide = 1;
-				}
-				continue;
-			}
-			else if(_2048[x][y+1] != 0){
-				continue;
-			}
-			else if(_2048[x][y+1] == 0){
-				_2048[x][y+CountZero(2,x,y)] = _2048[x][y];		
-				_2048[x][y] = 0;
-				decide = 1;
-			}
-		}
-	}
-	if(decide){
-		Seed();
-	}
-	system("cls");
-	Display();
-	return 0; 
+	return (rand()%4 == 0)?4:2;
 }
 
-int Left(void)
+int FindMax(void)
 {
-	int x,y;
-	int decide = 0;                     //判断是否有元素合并 
-	for(x = 1;x < 4;x++){				//这里的x从1开始，因为第0号元素无移动意义
-		for(y = 0;y < 4;y++){		 
-			if(_2048[x][y] == 0){
-				continue;
-			}
-			else if(_2048[x-1][y] == _2048[x][y]){
-				Score += (_2048[x-1][y] = _2048[x][y]*2);
-				_2048[x][y] = 0;
-				decide = 1; 
-				continue;
-			}
-			else if(_2048[x-2][y] == _2048[x][y]){
-				if(_2048[x-1][y] == 0){
-					Score += (_2048[x-2][y] = _2048[x][y]*2);
-					_2048[x][y] = 0;
-					decide = 1;
-				}
-				continue;
-			}
-			else if(_2048[x-3][y] == _2048[x][y]){
-				if(_2048[x-2][y] == 0 && _2048[x-1][y] == 0){
-					Score += (_2048[x-3][y] = _2048[x][y]*2);
-					_2048[x][y] = 0;
-					decide = 1;
-				}
-				continue;
-			}
-			else if(_2048[x-1][y] != 0){
-				continue;
-			}
-			else if(_2048[x-1][y] == 0){
-				_2048[x-CountZero(3,x,y)][y] = _2048[x][y];		
-				_2048[x][y] = 0;
-				decide = 1;
+	int Max = _2048[0][0];
+	int xPos,yPos;
+	for(xPos = 0;xPos < 4;xPos++)
+	{
+		for(yPos = 0;yPos < 4;yPos++)
+		{
+			if(_2048[xPos][yPos] > Max)
+			{
+				Max = _2048[xPos][yPos];
 			}
 		}
 	}
-	if(decide){
-		Seed();
-	}
-	system("cls");
-	Display();
-	return 0; 
-} 
+	return Max;
+}
 
-int Right(void)
+int GameOver(void)
 {
 	int x,y;
-	int decide = 0;                     //判断是否有元素合并 
-	for(x = 2;x >= 0;x--){				//这里的x从1开始，因为第0号元素无移动意义
-		for(y = 0;y < 4;y++){		 
-			if(_2048[x][y] == 0){
-				continue;
-			}
-			else if(_2048[x+1][y] == _2048[x][y]){
-				Score += (_2048[x+1][y] = _2048[x][y]*2);
-				_2048[x][y] = 0;
-				decide = 1; 
-				continue;
-			}
-			else if(_2048[x+2][y] == _2048[x][y]){
-				if(_2048[x+1][y] == 0){
-					Score += (_2048[x+2][y] = _2048[x][y]*2);
-					_2048[x][y] = 0;
-					decide = 1;
-				}
-				continue;
-			}
-			else if(_2048[x+3][y] == _2048[x][y]){
-				if(_2048[x+2][y] == 0 && _2048[x+1][y] == 0){
-					Score += (_2048[x+3][y] = _2048[x][y]*2);
-					_2048[x][y] = 0;
-					decide = 1;
-				}
-				continue;
-			}
-			else if(_2048[x+1][y] != 0){
-				continue;
-			}
-			else if(_2048[x+1][y] == 0){
-				_2048[x+CountZero(4,x,y)][y] = _2048[x][y];		
-				_2048[x][y] = 0;
-				decide = 1;
+	int count;
+	for(x = 0;x < 4;x++)
+	{
+		for(y = 0;y < 4;y++)
+		{
+			if(_2048[x][y])
+			{
+				count++;
 			}
 		}
 	}
-	if(decide){
-		Seed();
+	if(count == 4*4)
+	{
+		for(x = 0;x < 4;x++)
+		{
+			for(y = 0;y < 4;y++)
+			{
+				if(_2048[x][y] == _2048[x+1][y] || _2048[x][y] == _2048[x][y+1])
+				{
+					return 1;
+				}
+			}
+		}
+		return 0;
 	}
-	system("cls");
-	Display();
-	return 0; 
-} 
+	return 1;
+}
 
-void Display(void)
+int Display(void)
 {
-	printf("\n\n\n\t\t\t         BUGS 2048         ");
+	printf("\n\n\n\t\t\t          2048         ");
 	printf("\n\n\n\t\t\t---------------------------\n");
 	printf("\t\t\t┏━━┳━━┳━━┳━━┓\n");
 	printf("\t\t\t┃%4d┃%4d┃%4d┃%4d┃\n",_2048[0][0],_2048[1][0],_2048[2][0],_2048[3][0]);
@@ -296,112 +267,29 @@ void Display(void)
 	printf("\t\t\t┃%4d┃%4d┃%4d┃%4d┃\n",_2048[0][3],_2048[1][3],_2048[2][3],_2048[3][3]);
 	printf("\t\t\t┗━━┻━━┻━━┻━━┛\n");
 	printf("\t\t\t---------------------------\n");
-	printf("\t\t\t分数:%5d            \n\n",Score);
+	printf("\t\t\t分数:%5d            \n\n",FindMax());
 	printf("\t\t\t操作: W:↑ S:↓ A:← D:→\n\n");
 	system("color E");
+	return 0;
 }
 
-int CountZero(int No,int x,int y)
+int End(void)
 {
-	int count = 0;
-	int TMP;
-	switch(No)
-	{
-		case 1:{
-				for(TMP = 0;TMP < y;TMP++)
-				{				//纵向统计 从上至下 
-					if(_2048[x][TMP] == 0)
-					{
-						count++;
-					}
-				}
-				break;
-			}
-		case 2:{
-				for(TMP = 3;TMP > y;TMP--)
-				{
-					if(_2048[x][TMP] == 0)
-					{
-						count++;
-					}
-				}
-				break;
-			}
-		case 3:{
-				for(TMP = 0;TMP < x;TMP++){
-					if(_2048[TMP][y] == 0){
-						count++;
-					}
-				}
-				break;
-			} 
-		case 4:{
-				for(TMP = 3;TMP > x;TMP--){
-					if(_2048[TMP][y] == 0){
-						count++;
-					}
-				}
-				break;
-			}
-	}
-	return count;
-}
-
-int Detection(void)
-{
-	int x,y;
-	int count = 0;
-	int check = 0;
-	for(x=0;x < 4;x++){
-		for(y=0;y < 4;y++){
-			if(_2048[x][y] != 0)
-			{
-				count++;
-			}
-		}
-	}
-	/*如果满员*/
-	if(count == 16)
-	{
-		for(x=0;x < 4;x++){
-		for(y=0;y < 4;y++){
-			if(_2048[x][y] != _2048[x][y-1] && _2048[x][y+1] != _2048[x][y]){
-				return 0;
-			}else if(_2048[x][y] != _2048[x-1][y] && _2048[x+1][y] != _2048[x][y]){
-				return 0;
-			}
-		}
-	}
-	}
+	int ch = 0;
+	system("cls");
+	printf("游戏结束!\n");
+	printf("最终分数:%d\n\n",FindMax());
+	printf("1.退出游戏.\n\n2.再来一局.\n\n");
 	
-	return 1;
-}
-
-void GameOver(void)
-{
-	printf("\n\n");
-	printf("\t\t\t\t-----Game Over-----\n\n");
-	printf("\t\t\t\t Maker: vmpy (flee"); 
-	return;
-}
-
-void Seed(void)
-{
-	int x,y;
-	again:
-	x = rand()%4;
-	y = rand()%4;
-	if(_2048[x][y] != 0){
-		goto again;
+	do
+	{
+		scanf("%d",&ch);
+	}while(ch != 1 && ch != 2);
+	
+	switch(ch)
+	{
+		case 1:return 0;
+		case 2:return 1;
 	}
-	_2048[x][y] = Random();
-}
-
-int Random(void)
-{
-	int a;
-	int b;
-	a = rand()%10;
-	b = rand()%2;
-	return a>b?2:4;
+	return (int)("Impossible");
 }
